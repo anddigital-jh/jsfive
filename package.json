@@ -4,16 +4,10 @@
   "description": "A pure javascript HDF5 file reader, based on pyfive",
   "main": "index.js",
   "module": "index.js",
-  "browser": "dist/hdf5.js",
   "scripts": {
     "build": "parcel build index.js --target browser"
   },
-  "targets": {
-    "browser": {
-      "context": "browser",
-      "outputFormat": "global"
-    }
-  },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/usnistgov/jsfive"
