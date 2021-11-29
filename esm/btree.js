@@ -1,5 +1,6 @@
 import {_unpack_struct_from, _structure_size, struct, dtype_getter, bitSize, DataView64} from './core.js';
 import {default as pako} from '../web_modules/pako-es.js';
+import { vbz, decompress } from 'vbzjs';
 
 const zlib = {
   decompress: function(buf) {
@@ -313,8 +314,16 @@ export class BTreeV1RawDataChunks extends BTreeV1 {
       }
       let pipeline_entry = filter_pipeline[filter_index];
       let filter_id = pipeline_entry.get('filter_id');
+
       if (filter_id == GZIP_DEFLATE_FILTER) {
         chunk_buffer_out = zlib.decompress(chunk_buffer_out);
+      }
+      
+      else if (filter_id == VBZ_FILTER) {
+        console.log('BUFFER IN', filter_id, new Int16Array(chunk_buffer_out, 0, Math.floor(chunk_buffer_out.byteLength / 2)));
+        chunk_buffer_out = decompress(chunk_buffer_out);
+        // decompress(chunk_buffer_out, 1, true).then(res => console.log('PROMISE RES', res));
+        console.log('BUFFER OUT', new Int16Array(chunk_buffer_out, 0, Math.floor(chunk_buffer_out.byteLength / 2)));
       }
 
       else if (filter_id == SHUFFLE_FILTER) {
@@ -604,6 +613,7 @@ var RESERVED_FILTER = 0;
 export const GZIP_DEFLATE_FILTER = 1;
 export const SHUFFLE_FILTER = 2;
 export const FLETCH32_FILTER = 3;
+export const VBZ_FILTER = 32020;
 var SZIP_FILTER = 4;
 var NBIT_FILTER = 5;
 var SCALEOFFSET_FILTER = 6;
